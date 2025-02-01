@@ -1,0 +1,52 @@
+name: bunnychess_dev
+services:
+  postgres:
+    image: postgres:15.3
+    user: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: nestjs
+
+  redis:
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+    command: ['redis-server', '--requirepass', 'password']
+
+  nats:
+    image: nats:2.10.6-alpine3.18
+    command: ['-js', '-m', '8222', '--user', 'nats', '--pass', 'password', '--store_dir', '/data/js']
+    ports:
+      - 4222:4222
+      - 6222:6222
+      - 8222:8222
+    volumes:
+      - nats:/data/js
+
+  # pgadmin:
+  #   image: dpage/pgadmin4:7.5
+  #   networks:
+  #     - postgres
+  #   ports:
+  #     - 8080:80
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+  #     PGADMIN_DEFAULT_PASSWORD: 'admin'
+
+volumes:
+  postgres:
+  redis:
+  nats:
+
+networks:
+  postgres:
+    driver: bridge

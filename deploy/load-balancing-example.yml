@@ -1,0 +1,181 @@
+name: bunnychess_lb
+services:
+  authentication:
+    image: nginx:1.15-alpine
+    depends_on:
+      - authentication_1
+      - authentication_2
+    volumes:
+      - ./lb-conf/authentication:/etc/nginx/conf.d
+    expose:
+      - 50051
+
+  matchmaking:
+    image: nginx:1.15-alpine
+    depends_on:
+      - matchmaking_1
+      - matchmaking_2
+    volumes:
+      - ./lb-conf/matchmaking:/etc/nginx/conf.d
+    expose:
+      - 50052
+
+  game:
+    image: nginx:1.15-alpine
+    depends_on:
+      - game_1
+      - game_2
+    volumes:
+      - ./lb-conf/game:/etc/nginx/conf.d
+    expose:
+      - 50053
+
+  gateway_1: &gateway_bp
+    env_file:
+      - ./env/.common.env
+      - ./env/.gateway.env
+    build:
+      context: ../backend
+      args:
+        - APP=gateway
+    restart: unless-stopped
+    expose:
+      - 3000
+    depends_on:
+      - authentication
+      - matchmaking
+      - game
+  
+  gateway_2:
+    <<: *gateway_bp
+
+  authentication_1: &authentication_bp
+    env_file:
+      - ./env/.common.env
+      - ./env/.authentication.env
+    build:
+      context: ../backend
+      args:
+        - APP=authentication
+    restart: unless-stopped
+    expose:
+      - 50051
+    depends_on:
+      nats:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+ 
+  authentication_2:
+    <<: *authentication_bp
+  
+  matchmaking_1: &matchmaking_bp
+    env_file:
+      - ./env/.common.env
+      - ./env/.matchmaking.env
+    build:
+      context: ../backend
+      args:
+        - APP=matchmaking
+    restart: unless-stopped
+    expose:
+      - 50052
+    depends_on:
+      nats:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  matchmaking_2:
+    <<: *matchmaking_bp
+
+  game_1: &game_bp
+    env_file:
+      - ./env/.common.env
+      - ./env/.game.env
+    build:
+      context: ../backend
+      args:
+        - APP=game
+    restart: unless-stopped
+    expose:
+      - 50053
+    depends_on:
+      nats:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  game_2:
+    <<: *game_bp
+
+  frontend:
+    build:
+      context: ../frontend
+    restart: unless-stopped
+    volumes:
+      - ./lb-conf/frontend:/etc/nginx/conf.d
+    depends_on:
+      - gateway_1
+      - gateway_2
+    ports:
+      - 80:80
+
+  postgres:
+    env_file:
+      - ./env/.postgres.env
+    image: postgres:15.3
+    user: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    environment:
+      POSTGRES_USER: postgres
+    restart: unless-stopped
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    expose:
+      - 5432
+
+  redis:
+    image: redis:7.2.3-alpine3.18
+    expose:
+      - 6379
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--maxmemory-policy", "noeviction"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - redis:/data
+    restart: unless-stopped
+
+  nats:
+    env_file:
+      - ./env/.nats.env
+    image: nats:2.10.6-alpine3.18
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8222/healthz"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    command: ["-js", "-m", "8222", "--user", "nats", "--pass", "${NATS_PASSWORD}", '--store_dir', '/data/js']
+    expose:
+      - 4222
+      - 6222
+      - 8222
+    volumes:
+      - nats:/data/js
+
+volumes:
+  postgres:
+  redis:
+  nats:

@@ -1,0 +1,19 @@
+body {
+  @apply h-full relative text-2xl text-yellow-400 text-shadow shadow-black bg-blue-900;
+}
+
+button {
+  @apply text-2xl text-yellow-400 text-shadow shadow-black bg-blue-600 py-2 px-4 rounded;
+}
+
+button:disabled {
+  @apply bg-blue-900 text-gray-500;
+}
+
+button:enabled:hover {
+  @apply bg-blue-800;
+}
+
+input {
+  @apply block w-full rounded text-white text-shadow shadow-black bg-blue-900 h-10 p-2 text-center;
+}
