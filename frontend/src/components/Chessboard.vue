@@ -119,7 +119,9 @@ onMounted(async () => {
     return Promise.all(
       ['K', 'Q', 'B', 'N', 'R', 'P', 'k', 'q', 'b', 'n', 'r', 'p'].map((piece) => {
         const image = new Image();
-        image.src = `pieces/${piece}.svg`;
+        // Pieces of different colors are stored in separate folders to prevent issues with case-insensitive file systems
+        const color = piece === piece.toUpperCase() ? 'w' : 'b';
+        image.src = `pieces/${color}/${piece}.svg`;
         images[piece] = image;
         return new Promise<void>((resolve) => {
           image.onload = () => resolve();
