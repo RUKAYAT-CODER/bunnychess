@@ -122,7 +122,6 @@ It's possible to enable New Relic tracing just by adding this code block to each
 environment:
    NEW_RELIC_APP_NAME: bunnychess-MICROSERVICE_NAME
    NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
-   NEW_RELIC_LOG_LEVEL: debug
 command: ["node", "-r", "newrelic", "dist/apps/MICROSERVICE_NAME/main"]
 ```
 
