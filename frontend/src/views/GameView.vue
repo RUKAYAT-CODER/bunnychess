@@ -35,11 +35,12 @@ const gameResult = computed<string | undefined>(() => {
   if (!gameOver.value) {
     return undefined;
   }
-  let outcome = gameOver.value.winnerAccountId
-    ? gameOver.value.winnerAccountId === me.id
-      ? 'Victory'
-      : 'Defeat'
-    : 'Draw';
+  let outcome =
+    gameOver.value.winnerAccountId != null
+      ? gameOver.value.winnerAccountId === me.id
+        ? 'Victory'
+        : 'Defeat'
+      : 'Draw';
 
   return `${outcome} (${getPrettyGameOverReason(gameOver.value.gameOverReason)})`;
 });

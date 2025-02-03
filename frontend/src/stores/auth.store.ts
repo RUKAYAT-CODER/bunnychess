@@ -18,7 +18,7 @@ interface Me {
 }
 
 const anonymousAccount: Readonly<Me> = Object.freeze({
-  id: '',
+  id: 'anonymous',
   email: '',
   isAdmin: false,
   username: '',
