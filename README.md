@@ -27,7 +27,7 @@ Feel free to contact me on LinkedIn for ideas, discussions and opportunities ðŸ™
 
 ## Scope of the project
 This is a toy project designed to experiment with NestJS microservices and gRPC, leveraging NATS JetStream and its persistent queues to demonstrate how it can be used to build fault-tolerant distributed systems.  
-The microservices are stateless and horizontally scalable, with Redis used to maintain game state. To support Redis Cluster scaling, no dynamically computed keys are used in Lua scripts.  
+The microservices are stateless and horizontally scalable, with Redis used to maintain game state.  
 A more traditional stateful server approach was intentionally avoided, as it would have reduced the project to a load-balancing exercise between server instances while keeping the game state in memory.  
 
 ## Quick start
@@ -99,14 +99,14 @@ It uses Redis to store refresh tokens and perform token rotation, ensuring secur
 #### Matchmaking
 The Matchmaking service manages matchmaking queues, pairs players of similar skill levels, and tracks player rankings.  
 When two players are matched, it contacts the Game service to create a new chess game instance.  
-The matchmaking algorithm is implemented entirely in Redis using Lua scripts and is triggered at regular intervals by a BullMQ job. The algorithm uses an ELO search window that dynamically expands over time, prioritizing players who have waited longer in the queue and it can match over 10000 concurrently enqueued players in less than 30 milliseconds.  
+The matchmaking algorithm is implemented entirely in Redis using Lua scripts and is triggered at regular intervals by a BullMQ job. The algorithm uses an Elo search window that dynamically expands over time, prioritizing players who have waited longer in the queue and it can match over 10000 concurrently enqueued players in less than 30 milliseconds.  
 Lua scripts ensure the atomicity of multiple commands and dynamically computed keys are avoided to maintain scalability in Redis Cluster environments.  
-The service listens for persistent `bunnychess.game.game-over` events from the Game microservice to update player ELO rankings after a match ends.
+The service listens for persistent `bunnychess.game.game-over` events from the Game microservice to update player Elo rankings after a match ends.
 
 #### Game
 The Game service handles game creation requests and implements the logic for processing game moves and resignation requests.  
 It uses Lua scripts in combination with a sequence number to perform atomic CAS (Check-And-Set) operations when updating game states.  
-When a game ends, the service emits a persistent, long-lived game result message (`bunnychess.game.game-over`), ensuring that the Matchmaking service processes the result reliably, even in the event of outages. Each `bunnychess.game.game-over` event includes metadata containing the players' ELO rankings at the start of the game. This simplifies ranking calculations and eliminates the need to limit NATS queue consumer parallelism to preserve the order of game-over events.
+When a game ends, the service emits a persistent, long-lived game result message (`bunnychess.game.game-over`), ensuring that the Matchmaking service processes the result reliably, even in the event of outages. Each `bunnychess.game.game-over` event includes metadata containing the players' Elo rankings at the start of the game. This simplifies ranking calculations and eliminates the need to limit NATS queue consumer parallelism to preserve the order of game-over events.
 
 ### NATS JetStream
 NATS is used as the messaging system to enable asynchronous communication between microservices.  
