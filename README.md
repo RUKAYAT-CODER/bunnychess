@@ -51,7 +51,7 @@ Alternatively, you can start a multi-instance example that demonstrates load bal
 docker compose -f load-balancing-example.yml up
 ```
 
-After some time (first execution might be slow), open browser and navigate to http://localhost  
+After some time (first execution might be slow), open browser and navigate to http://localhost:8080  
 <br/>
 
 ## Observe microservices in action!
