@@ -19,7 +19,7 @@ Included features:
 Tech stack:
 - 💻 Typescript + NestJS microservices (monorepo)
 - 🖌️ Vue.js + Pinia
-- 📔 NATS JetStream, PostgreSQL ([kysley](https://github.com/kysely-org/kysely)), Redis
+- 📔 NATS JetStream, PostgreSQL ([kysely](https://github.com/kysely-org/kysely)), Redis
 - 🗣️ gRPC, WebSocket ([Socket.IO](https://socket.io/)), HTTP
 - 🐳 docker compose
 
@@ -172,7 +172,7 @@ Let's imagine we want to add a new _deleteAccount_ method to _Authentication_ mi
 #### Add a new database collection
 - Add a new entry to one of the migration files (e.g. [the Matchmaking one](https://github.com/pietrobassi/bunnychess/blob/main/backend/apps/matchmaking/src/database/migrations.ts)), defining migration name and up/down commands
 - Restart the service to apply the migration (PostgreSQL must be running)
-- Add new table name to _--include-pattern_ option of `matchmaking:db:generate-schema` _package.json_ script and run command `yarn matchmaking:db:generate-schema` to generate [Kysley schema](https://github.com/pietrobassi/bunnychess/blob/main/backend/apps/matchmaking/src/database/schema.ts)
+- Add new table name to _--include-pattern_ option of `matchmaking:db:generate-schema` _package.json_ script and run command `yarn matchmaking:db:generate-schema` to generate [Kysely schema](https://github.com/pietrobassi/bunnychess/blob/main/backend/apps/matchmaking/src/database/schema.ts)
 - Start using the new table inside repositories, supported by type-safe queries
 
 ## Contributing

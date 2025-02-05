@@ -7,7 +7,7 @@ export interface PostgresMigration extends Migration {
 }
 
 /**
- * Helper class for running Kysley Postgres migrations.
+ * Helper class for running Kysely Postgres migrations.
  *
  * Ideally, migrations are run by DevOps in a more controlled way, since they could heavily impact performance
  * once database becomes big.
