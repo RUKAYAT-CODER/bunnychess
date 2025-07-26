@@ -3,8 +3,6 @@
 ### Scalable, distributed, stateless chess server based on gRPC microservices.
 #### _Built with [NestJS](https://nestjs.com/) + [Vue.js](https://vuejs.org/), leveraging [NATS JetStream](https://docs.nats.io/nats-concepts/jetstream), [PostgreSQL](https://www.postgresql.org/) and [Redis](https://redis.io/)._
 
-### <ins>Try it here: https://bunnychess.pietrobassi.com</ins>
-
 ![image](docs/images/game.png)
 
 ![image](docs/images/lobby.png)
